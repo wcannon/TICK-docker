@@ -25,7 +25,8 @@ services:
   ## Note: this version of chronograf does not provide the ability
   ## to upload tick scripts already written
   chronograf:
-    image: chronograf:1.3.8
+    #image: chronograf:1.3.8
+    image: chronograf
     environment:
       INFLUXDB_URL: http://influxdb:8086
       KAPACITOR_URL: http://kapacitor:9092
