@@ -6,6 +6,8 @@ services:
     image: telegraf:1.4.0
     volumes:
       - ./etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf-configs:/etc/telegraf/telegraf.d
+      - ./telegraf-scripts:/tmp/scripts
     links:
       - influxdb
     ports:
@@ -20,6 +22,8 @@ services:
     ports:
       - "8086:8086"
   # Define a Chronograf service
+  ## Note: this version of chronograf does not provide the ability
+  ## to upload tick scripts already written
   chronograf:
     image: chronograf:1.3.8
     environment:
@@ -30,9 +34,24 @@ services:
     links:
       - influxdb
       - kapacitor
+  # Grafana dockerized info:  https://grafana.com/docs/installation/docker/
+  # todo: setup data source automatically to http://influxdb:8086   no username/password
+  grafana:
+    image: grafana/grafana:latest
+    #environment:
+    #  INFLUXDB_URL: http://influxdb:8086
+    #  KAPACITOR_URL: http://kapacitor:9092
+    ports:
+      - "3000:3000"
+    links:
+      - influxdb
+      - kapacitor
   # Define a Kapacitor service
   kapacitor:
     image: kapacitor:1.3.3
+    volumes:
+      - ./alerts:/tmp/alerts
+      - ./kapacitor-tests:/tmp/kapacitor-tests
     environment:
       KAPACITOR_HOSTNAME: kapacitor
       KAPACITOR_INFLUXDB_0_URLS_0: http://influxdb:8086
